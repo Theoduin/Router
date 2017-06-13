@@ -1,0 +1,29 @@
+language: php
+
+dist: trusty
+sudo: required
+
+jdk:
+  - oraclejdk8
+cache:
+  directories:
+    - '$HOME/.sonar/cache'
+php:
+  - '5.6'
+  - '7.0'
+  - '7.1'
+  - nightly
+
+before_install: composer install
+
+addons:
+  sonarqube:
+    organization: "theoduin"
+    token:
+      secure: $SONAR_TOKEN
+    github_token:
+      secure: $SONAR_GITHUB_TOKEN
+
+script:
+  - $TRAVIS_BUILD_DIR/vendor/bin/phpunit
+  - sonar-scanner
