@@ -27,8 +27,17 @@ class Router
     public function dispatch()
     {
         $match = $this->match();
-        if ($match && is_callable($match['action'])) {
-            echo call_user_func_array($match['action'], $match['params']);
+        if ($match) {
+            if (is_string($match['action'])) {
+                $parts = explode('/',$match['action']);
+                $last = end($parts);
+                $segments = explode('@',$last);
+                $controller = new $segments[0]();
+                $match['action'] = [$controller, $segments[1]];
+            }
+            if (is_callable($match['action'])) {
+                echo call_user_func_array($match['action'], $match['params']);
+            }
         } else {
             // no route was matched
             header($_SERVER["SERVER_PROTOCOL"] . ' 404 Not Found');
