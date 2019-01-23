@@ -17,6 +17,15 @@ class Router
     }
 
     /**
+     * @param string $uri
+     * @param \Closure|array|string $action
+     */
+    public function post($uri, $action)
+    {
+        $this->routes[] = ['method' => 'POST', 'uri' => $uri, 'action' => $action];
+    }
+
+    /**
      * @return array
      */
     public function getRoutes()
@@ -27,6 +36,15 @@ class Router
     public function dispatch()
     {
         $match = $this->match();
+        if ($match && !is_callable($match['action'])) {
+            $explodedAction = explode('@', $match['action']);
+            if (count($explodedAction) == 2) {
+                $match['action'] = [
+                    new $explodedAction[0],
+                    $explodedAction[1]
+                ];
+            }
+        }
         if ($match && is_callable($match['action'])) {
             echo call_user_func_array($match['action'], $match['params']);
         } else {
